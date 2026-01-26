@@ -5,7 +5,7 @@ from mcp.server.lowlevel import NotificationOptions, Server
 from mcp.server.models import InitializationOptions
 import json
 import db
-
+import leetcode_client
 
 server = Server("leetprep-mcp Server")
 
@@ -68,7 +68,7 @@ async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
             created_at
         )
         return [types.TextContent(type="text", text=json.dumps(result))]
-    if name == "fetch_problem":
+    elif name == "fetch_problem":
         slug = arguments["slug"] 
         result = leetcode_client.fetch_problem(slug)
         return [types.TextContent(type="text", text=json.dumps(result))]
