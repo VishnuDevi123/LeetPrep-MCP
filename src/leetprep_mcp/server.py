@@ -30,8 +30,20 @@ async def list_tools() -> list[types.Tool]:
                     "created_at": {"type": "string", "description": "timestamp when the problem was created"},
                     },
                 "required": ["leetcode_id", "title", "slug", "difficulty", "patterns", "companies", "created_at"],
+                
             },
-            )
+            ),
+        types.Tool(
+            name="fetch_problem",
+            description="Fetch a LeetCode problem's details from making a http request using the title slug and exttracing the infromation from the responce",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "slug": {"type": "string", "description": "Problem URL slug (e.g., 'two-sum')"}
+                },
+                "required": ["slug"]
+            }
+        )
     ]
   
 # Implement the tool call handler
@@ -55,8 +67,12 @@ async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
             companies,
             created_at
         )
-        
         return [types.TextContent(type="text", text=json.dumps(result))]
+    if name == "fetch_problem":
+        slug = arguments["slug"] 
+        result = leetcode_client.fetch_problem(slug)
+        return [types.TextContent(type="text", text=json.dumps(result))]
+        
     
     else:
         raise ValueError(f"Unknown tool: {name}")
