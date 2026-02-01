@@ -34,3 +34,44 @@ def fetch_problem(slug: str) -> dict:
         "patterns": patterns,     # Extract from topicTags
         "companies":[],    # Extract if available
     }
+
+def fetch_user_stats(username: str) -> dict:
+    """
+    Fetch user stats from alfa-leetcode-api.
+    
+    Args:
+        username: LeetCode username
+    Returns: user stats as a dict
+    """
+    response = requests.get(f"{ALFA_API_BASE}/{username}/stats")
+    if response.status_code != 200:
+        return {"error": True, "message": f"API returned status {response.status_code}"}
+    return response.json()
+
+def fetch_submissions(username: str, limit: int = 20) -> dict:
+    """
+    Fetch recent submissions for a user from alfa-leetcode-api.
+    
+    Args:
+        username: LeetCode username
+        limit: Number of recent submissions to fetch
+    Returns: recent submissions as a dict
+    """
+    response = requests.get(f"{ALFA_API_BASE}/{username}/submissions?limit={limit}")
+    if response.status_code != 200:
+        return {"error": True, "message": f"API returned status {response.status_code}"}
+    return response.json()
+
+def fetch_profile(username: str) -> dict:
+    """
+    Fecth user profile information from alfa-leetcode-api.
+    Args:
+        username (str): _description_
+
+    Returns:
+        dict: _description_
+    """
+    response = requests.get(f"{ALFA_API_BASE}/{username}/profile")
+    if response.status_code != 200:
+        return {"error": True, "message": f"API returned status {response.status_code}"}
+    return response.json()

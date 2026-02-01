@@ -31,7 +31,7 @@ async def list_tools() -> list[types.Tool]:
                     },
                 "required": ["leetcode_id", "title", "slug", "difficulty", "patterns", "companies", "created_at"],
                 
-            },
+            }
             ),
         types.Tool(
             name="fetch_problem",
@@ -42,6 +42,54 @@ async def list_tools() -> list[types.Tool]:
                     "slug": {"type": "string", "description": "Problem URL slug (e.g., 'two-sum')"}
                 },
                 "required": ["slug"]
+            }
+        ),
+        types.Tool(
+            name="track_progress",
+            description="Track progress on a LeetCode problem by recording status, time taken, and notes.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "leetcode_id": {"type": "integer", "description": "leetcode problem id"},
+                    "status": {"type": "string", "description": "status of the problem, like solved, attempted, not started"},
+                    "time_taken_mins": {"type": "integer", "description": "time taken to solve the problem in minutes"},
+                    "notes": {"type": "string", "description": "additional notes about the problem"},
+                    },
+                "required": ["leetcode_id", "status"],
+                
+            }
+        ),
+        types.Tool(
+            name="fetch_user_state",
+            description="Fetch user stats from alfa-leetcode-api.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "username": {"type": "string", "description": "LeetCode username"}
+                },
+                "required": ["username"]
+            }
+        ),
+        types.Tool(
+            name="fetch_submissions",
+            description="Fetch recent 20 submissions for a user from alfa-leetcode-api.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "username": {"type": "string", "description": "LeetCode username"}
+                },
+                "required": ["username"]
+            }
+        ),
+        types.Tool(
+            name="fetch_profile",
+            description="Fecth user profile information from alfa-leetcode-api.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "username": {"type": "string", "description": "LeetCode username"}
+                },
+                "required": ["username"]
             }
         )
     ]
@@ -72,7 +120,33 @@ async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
         slug = arguments["slug"] 
         result = leetcode_client.fetch_problem(slug)
         return [types.TextContent(type="text", text=json.dumps(result))]
-        
+    
+    elif name == "track_progress":
+        leetcode_id = arguments["leetcode_id"]
+        status = arguments["status"]
+        time_taken_mins = arguments.get("time_taken_mins", 0)
+        notes = arguments.get("notes", "")
+        result = db.track_progress(
+            leetcode_id,
+            status,
+            time_taken_mins,
+            notes
+        )
+        return [types.TextContent(type="text", text=json.dumps(result))]
+    elif name == "fetch_user_state":
+        username = arguments["username"]
+        result = leetcode_client.fetch_user_stats(username)
+        return [types.TextContent(type="text", text=json.dumps(result))]
+    
+    elif name == "fetch_submissions":
+        username = arguments["username"]
+        result = leetcode_client.fetch_submissions(username)
+        return [types.TextContent(type="text", text=json.dumps(result))]
+    
+    elif name == "fetch_profile":
+        username = arguments["username"]
+        result = leetcode_client.fetch_profile(username)
+        return [types.TextContent(type="text", text=json.dumps(result))]
     
     else:
         raise ValueError(f"Unknown tool: {name}")
@@ -100,6 +174,4 @@ async def run():
 if __name__ == "__main__":
     import asyncio
     asyncio.run(run())
-    
-    
     
