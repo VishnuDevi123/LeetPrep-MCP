@@ -91,7 +91,8 @@ async def list_tools() -> list[types.Tool]:
                 },
                 "required": ["username"]
             }
-        )
+        ),
+        
     ]
   
 # Implement the tool call handler

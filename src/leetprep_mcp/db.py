@@ -85,6 +85,34 @@ def track_progress(leetcode_id: int, status: str, time_taken_mins: int, notes: s
 
     return {"success": True, "message": f"Progress tracked for problem {leetcode_id}"}
 
-
+def get_stats():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT COUNT(*) FROM problems WHERE status = 'solved'")
+    solved = cursor.fetchone()[0]
+    
+    cursor.execute("SELECT COUNT(*) FROM problems WHERE status = 'attempted")
+    attempted = cursor.fetchone()[0]
+    
+    cursor.execute("SELECT AVG(time_taken_mins) FROM progress WHERE time_taken_mins > 0")
+    avg_time = cursor.fetchone()[0] or 0
+    
+    cursor.execute("SELECT COUNT(DISTINCT leetcode_id) FROM progress")
+    unique_problems=  cursor.fetchone()[0]
+    
+    conn.close()
+    
+    return{
+        "total_soled": solved,
+        "total_attempted": attempted,
+        "avg_time_mins": round(avg_time, 1),
+        "unique_problems": unique_problems
+    }
+    
+def get_weaknesses():
+    conn = sqlite3.connect(DB_PATH)
+    
+    
 if __name__ == "__main__":
     init_db()
