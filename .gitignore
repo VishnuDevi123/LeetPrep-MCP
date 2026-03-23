@@ -1,0 +1,6 @@
+/tests
+/venv
+__pycache__
+*.pyc
+/data
+app_database.db
